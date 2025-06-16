@@ -1,12 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
+
+	"github.com/nunseik/pokedexcli/internal/pokecache"
 )
 
-func commandMapf(cfg *config) (error) {
-	locationsResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationsURL)
+func commandMapf(cache *pokecache.Cache, cfg *config) (error) {
+	locationsResp, err := cfg.pokeapiClient.ListLocations(cache, cfg.nextLocationsURL)
 
 	if err != nil {
 		return err
@@ -21,11 +23,11 @@ func commandMapf(cfg *config) (error) {
 	return nil
 }
 
-func commandMapb (cfg *config) (error) {
+func commandMapb (cache *pokecache.Cache, cfg *config) (error) {
 	if cfg.prevLocationsURL == nil {
 		return errors.New("you're on the first page")
 	}
-	locationsResp, err := cfg.pokeapiClient.ListLocations(cfg.prevLocationsURL)
+	locationsResp, err := cfg.pokeapiClient.ListLocations(cache, cfg.prevLocationsURL)
 	if err != nil {
 		return err
 	}

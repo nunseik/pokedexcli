@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/nunseik/pokedexcli/internal/pokeapi"
+	"github.com/nunseik/pokedexcli/internal/pokecache"
 )
 
 type config struct {
@@ -15,7 +16,7 @@ type config struct {
 	prevLocationsURL *string
 }
 
-func startRepl(cfg *config) {
+func startRepl(cache *pokecache.Cache, cfg *config) {
 
 	reader := bufio.NewScanner(os.Stdin)
 
@@ -29,7 +30,7 @@ func startRepl(cfg *config) {
 
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback(cfg)
+			err := command.callback(cache, cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -44,7 +45,7 @@ func startRepl(cfg *config) {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*pokecache.Cache, *config) error
 }
 
 func getCommands() map[string]cliCommand {
