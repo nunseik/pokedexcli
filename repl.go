@@ -27,10 +27,14 @@ func startRepl(cache *pokecache.Cache, cfg *config) {
 		words := cleanInput(reader.Text())
 
 		commandName := words[0]
-
+		locationArg := ""
+		if len(words) > 1 {
+			locationArg = words[1]
+		}
+		
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback(cache, cfg)
+			err := command.callback(cache, cfg, locationArg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -45,7 +49,7 @@ func startRepl(cache *pokecache.Cache, cfg *config) {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokecache.Cache, *config) error
+	callback    func(*pokecache.Cache, *config, string) error
 }
 
 func getCommands() map[string]cliCommand {
