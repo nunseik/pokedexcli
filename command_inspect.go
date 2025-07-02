@@ -16,3 +16,14 @@ func commandInspect(cache *pokecache.Cache, cfg *config, pokemon string) error {
 	} 
 	return errors.New("pokemon not in pokedex")
 }
+
+func commandPokedex (cache *pokecache.Cache, cfg *config, arg string) error {
+	if len(cfg.pokedex) == 0 {
+		return errors.New("no pokemons in your pokedex, go catch them")
+	}
+	fmt.Println("Your Pokedex:")
+	for _, pokemon := range cfg.pokedex {
+		fmt.Printf("- %s\n", pokemon.Name)
+	}
+	return nil
+}
