@@ -22,7 +22,7 @@ func commandMapf(cache *pokecache.Cache, cfg *config, locationArg string) (error
 	return nil
 }
 
-func commandMapb (cache *pokecache.Cache, cfg *config, locationArg string) (error) {
+func commandMapb (cache *pokecache.Cache, cfg *config, arg string) (error) {
 	if cfg.prevLocationsURL == nil {
 		return errors.New("you're on the first page")
 	}

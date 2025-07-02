@@ -2,15 +2,16 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"net/http"
-	"github.com/nunseik/pokedexcli/internal/pokecache"
-	"io"
 	"errors"
+	"io"
+	"net/http"
+
+	"github.com/nunseik/pokedexcli/internal/pokecache"
 )
 
 // ListLocations -
 func (c *Client) GetLocationPokemon(cache *pokecache.Cache, locationArg string) (RespShallowPokemons, error) {
-	
+
 	if locationArg == "" {
 		return RespShallowPokemons{}, errors.New("location not provided")
 	}
@@ -25,14 +26,13 @@ func (c *Client) GetLocationPokemon(cache *pokecache.Cache, locationArg string) 
 		}
 		return pokemons, nil
 	}
-	
+
 	// Not cached, fetch from API:
 	res, err := http.Get(url)
 	if err != nil {
 		return RespShallowPokemons{}, err
 	}
 	defer res.Body.Close()
-	
 
 	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -44,6 +44,44 @@ func (c *Client) GetLocationPokemon(cache *pokecache.Cache, locationArg string) 
 	err = json.Unmarshal(bodyBytes, &pokemons)
 	if err != nil {
 		return RespShallowPokemons{}, err
+	}
+
+	return pokemons, nil
+}
+
+func (c *Client) GetPokemon(cache *pokecache.Cache, pokemon string) (Pokemon, error) {
+	if pokemon == "" {
+		return Pokemon{}, errors.New("pokemon name not provided")
+	}
+
+	url := baseURL + "/pokemon/" + pokemon
+
+	if data, ok := cache.Get(url); ok {
+		var pokemons Pokemon
+		err := json.Unmarshal(data, &pokemons)
+		if err != nil {
+			return Pokemon{}, err
+		}
+		return pokemons, nil
+	}
+
+	// Not cached, fetch from API:
+	res, err := http.Get(url)
+	if err != nil {
+		return Pokemon{}, err
+	}
+	defer res.Body.Close()
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return Pokemon{}, err
+	}
+	cache.Add(url, bodyBytes)
+
+	var pokemons Pokemon
+	err = json.Unmarshal(bodyBytes, &pokemons)
+	if err != nil {
+		return Pokemon{}, err
 	}
 
 	return pokemons, nil
